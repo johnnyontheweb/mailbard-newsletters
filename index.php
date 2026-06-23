@@ -44,7 +44,12 @@ function mailbard_loader() {
 		require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'legacy'.DIRECTORY_SEPARATOR.'index.php');
 		
 		// load additional new code here
-		require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'admin'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'mailbard-ajax.php');
+		$mailbard_ajax_file = dirname(__FILE__).DIRECTORY_SEPARATOR.'admin'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'mailbard-ajax.php';
+		if ( file_exists( $mailbard_ajax_file ) ) {
+			require_once( $mailbard_ajax_file );
+		} else {
+			add_action( 'admin_notices', 'mailbard_missing_file_warning' );
+		}
 		
 	}
 }
@@ -53,6 +58,14 @@ function mailbard_wysija_warning() {
 	?>
 	<div class="notice error">
 		<p><?php printf( __( 'MailBard cannot run while MailPoet 2 is still activated.  Please go to your <a href="%s">Plugins</a> page and de-activate MailPoet 2 now.  Don\'t worry, you won\'t lose any data, and MailBard will pick up right where you left off!', 'mailbard' ), admin_url('plugins.php') ); ?></p>
+	</div>
+	<?php
+}
+
+function mailbard_missing_file_warning() {
+	?>
+	<div class="notice error">
+		<p><?php _e( 'MailBard Error: Required file admin/includes/mailbard-ajax.php is missing. Please re-install the plugin to resolve this issue.', 'mailbard' ); ?></p>
 	</div>
 	<?php
 }
