@@ -6,6 +6,7 @@ class WYSIJA_view_back_campaigns extends WYSIJA_view_back {
 	var $icon = 'icon-edit-news';
 	var $column_action_list = 'name';
 	var $queuedemails = false;
+	var $jsTrans = array();  // PHP 8+ compatibility
 
 	function __construct() {
 		$this->title = __('All Newsletters');

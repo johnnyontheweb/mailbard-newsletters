@@ -11,6 +11,7 @@ class WYSIJA_model_campaign extends WYSIJA_model{
     );
     var $escapeFields=array('name','description');
     var $escapingOn=true;
+    var $countRows=0;
 
     function __construct(){
         parent::__construct();

@@ -271,8 +271,18 @@ class WYSIJA_help extends WYSIJA_object{
 
 	function widgets_init() {
 		//load the widget file
-		require_once(WYSIJA_WIDGETS.'wysija_nl.php');
-		register_widget( 'WYSIJA_NL_Widget' );
+		$widget_file = WYSIJA_WIDGETS.'wysija_nl.php';
+		
+		// PHP 8+ compatibility: check if file exists before requiring
+		if (!file_exists($widget_file)) {
+			// Fallback: try alternative path
+			$widget_file = dirname(dirname(__DIR__)).'/widgets/wysija_nl.php';
+		}
+		
+		if (file_exists($widget_file)) {
+			require_once($widget_file);
+			register_widget( 'WYSIJA_NL_Widget' );
+		}
 	}
 
 	public function admin_enqueue_scripts(){
@@ -455,7 +465,7 @@ class WYSIJA extends WYSIJA_object{
 	 * @return boolean
 	 */
 	public static function load_lang( $extendedplugin = false ){
-		static $extensionloaded = false;
+		static $extensionloaded = array();  // PHP 8+ fix: initialize as array instead of false
 
 		//we return the entire array of extensions loaded if non is specified
 		if ( ! $extendedplugin ) {

@@ -7,6 +7,10 @@ defined('WYSIJA') or die('Restricted access');
  */
 class WYSIJA_help_back extends WYSIJA_help{
 
+	// PHP 8+ compatibility: declare dynamic properties
+	public $menus;
+	public $menuHelp;
+
     function __construct(){
         parent::__construct();
         //check that the application has been installed properly

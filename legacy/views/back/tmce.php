@@ -64,9 +64,15 @@ class WYSIJA_view_back_tmce extends WYSIJA_view_back{
                 <div id="widget-form">
 
                     <?php
-                    require_once(WYSIJA_WIDGETS.'wysija_nl.php');
-                    $widgetNL=new WYSIJA_NL_Widget(true);
-                    $widgetNL->form($datawidget);
+                    $widget_file = WYSIJA_WIDGETS.'wysija_nl.php';
+                    if (!file_exists($widget_file)) {
+                        $widget_file = dirname(dirname(dirname(__DIR__))).'/widgets/wysija_nl.php';
+                    }
+                    if (file_exists($widget_file)) {
+                        require_once($widget_file);
+                        $widgetNL=new WYSIJA_NL_Widget(true);
+                        $widgetNL->form($datawidget);
+                    }
                     ?>
                     <input type="hidden" name="widget_id" value="wysija-nl-<?php echo time(); ?>" />
                     <input type="submit" id="widget-insert" class="button-primary action" name="doaction" value="<?php echo esc_attr(__('Insert form', WYSIJA)); ?>">

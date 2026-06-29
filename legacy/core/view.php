@@ -13,6 +13,9 @@ class WYSIJA_view extends WYSIJA_object {
 
 	var $cols_nks = array( ); //correspondance between user_id and user-id once processed
 
+	var $action = ''; // PHP 8+ compatibility
+	var $model = null;  // PHP 8+ compatibility
+
 	static $color_coordinates = array( );
 
 	static $cache_color_schemes = array( );

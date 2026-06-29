@@ -3,6 +3,10 @@ defined( 'WYSIJA' ) or die( 'Restricted access' );
 
 class WYSIJA_help_update extends WYSIJA_object {
 
+	// PHP 8+ compatibility: declare dynamic properties
+	public $modelWysija;
+	public $updates;
+
 	function __construct(){
 		$this->modelWysija = new WYSIJA_model();
 

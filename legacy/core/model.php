@@ -29,6 +29,12 @@ class WYSIJA_model extends WYSIJA_object{
 	var $comparisonKeys = array('equal', 'notequal', 'like', 'greater', 'less', 'greater_eq', 'less_eq', 'is');
 	var $time_start = 0;
 	var $query_duration = 0;
+	var $wpdb = null;
+	var $wpprefix = '';
+	var $limit = 0;
+	var $page = 0;
+	var $limit_start = 0;
+	var $limit_end = 0;
 
 	function __construct($extensions=''){
 		if(defined('WYSIJA_DBG') && WYSIJA_DBG>0) $this->dbg=true;

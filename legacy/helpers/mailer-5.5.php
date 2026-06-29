@@ -37,6 +37,16 @@ class WYSIJA_help_mailer extends \PHPMailer\PHPMailer\PHPMailer {
   public   $ReplyTo        = array();
   public   $all_recipients = array();
   public   $attachment     = array();
+  
+  // Dynamic properties for PHP 8+ compatibility
+  public $core;
+  public $subscriberClass;
+  public $encodingHelper;
+  public $config;
+  public $PluginDir;
+  public $wp_user;
+  public $defaultMail;
+  public $sendHTML;
 
 	/**
 	 *
@@ -237,7 +247,8 @@ class WYSIJA_help_mailer extends \PHPMailer\PHPMailer\PHPMailer {
 		}
 
 		if(function_exists('mb_convert_encoding') && !empty($this->sendHTML)){
-			$this->Body = mb_convert_encoding($this->Body,'HTML-ENTITIES','UTF-8');
+			// PHP 8+ compatible: use htmlentities instead of deprecated mb_convert_encoding with HTML-ENTITIES
+			$this->Body = htmlentities($this->Body, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 			$this->Body = str_replace('&amp;','&',$this->Body);
 		}
 

@@ -22,6 +22,12 @@ class WYSIJA_module extends WYSIJA_control{
 	 */
 	protected $view_obj;
 
+	/**
+	 * instance of model class of module
+	 * @var object
+	 */
+	protected $model_obj;
+
 
 	/**
 	 * action/view of a hook

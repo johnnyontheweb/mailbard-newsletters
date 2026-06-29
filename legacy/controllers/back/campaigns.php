@@ -11,6 +11,7 @@ class WYSIJA_control_back_campaigns extends WYSIJA_control_back {
 	var $searchable = array('name', 'subject');
 	var $filters = array();
 	var $base_url = 'admin.php';
+	var $wpdb = null;  // PHP 8+ compatibility
 
 	function __construct(){
 	  global $wpdb;
@@ -1655,22 +1656,22 @@ class WYSIJA_control_back_campaigns extends WYSIJA_control_back {
 
 				if ($model_config->getValue('cron_manual')) {
 					$formsHelp = WYSIJA::get('forms', 'helper');
-					$queue_frequency = $formsHelp->eachValuesSec[$sending_emails_each];
-					$queue_scheduled = WYSIJA::get_cron_schedule('queue');
+				$sending_emails_each = $model_config->getValue('sending_emails_each');
+				$queue_frequency = isset($formsHelp->eachValuesSec[$sending_emails_each]) ? $formsHelp->eachValuesSec[$sending_emails_each] : 1800;
+				$queue_scheduled = WYSIJA::get_cron_schedule('queue');
 
-					$next_scheduled_queue = $queue_scheduled['next_schedule'];
-					$running = $queue_scheduled['running'];
+				$next_scheduled_queue = isset($queue_scheduled['next_schedule']) ? $queue_scheduled['next_schedule'] : 0;
+				$running = isset($queue_scheduled['running']) ? $queue_scheduled['running'] : 0;
 
-					if ($running) {
-						$helper_toolbox = WYSIJA::get('toolbox', 'helper');
-						$running = time() - $running;
-						$running = $helper_toolbox->duration_string($running, true, 4);
-					}
-				} else {
-					$schedules = wp_get_schedules();
-					$queue_frequency = $schedules[wp_get_schedule('wysija_cron_queue')]['interval'];
-					$next_scheduled_queue = wp_next_scheduled('wysija_cron_queue');
+				if ($running) {
+					$helper_toolbox = WYSIJA::get('toolbox', 'helper');
+					$running = time() - $running;
+					$running = $helper_toolbox->duration_string($running, true, 4);
 				}
+			} else {
+				$schedules = wp_get_schedules();
+				$schedule_name = wp_get_schedule('wysija_cron_queue');
+				$queue_frequency = (isset($schedules[$schedule_name]['interval']) && is_numeric($schedules[$schedule_name]['interval'])) ? $schedules[$schedule_name]['interval'] : 1800;
 
 
 
@@ -1710,8 +1711,17 @@ class WYSIJA_control_back_campaigns extends WYSIJA_control_back {
 							$cronsneeded = ceil($this->data['sent'][$key]['left'] / $sending_emails_number);
 							$this->data['sent'][$key]['remaining_time'] = $cronsneeded * $queue_frequency;
 							$this->data['sent'][$key]['running_for'] = $running;
-							$this->data['sent'][$key]['next_batch'] = $next_scheduled_queue - time();
-							$this->data['sent'][$key]['remaining_time'] = $this->data['sent'][$key]['remaining_time'] - ($queue_frequency) + $this->data['sent'][$key]['next_batch'];
+							
+							// PHP 8+ fix: validate next_scheduled_queue is a valid timestamp
+							if (is_numeric($next_scheduled_queue) && $next_scheduled_queue > 0) {
+								$this->data['sent'][$key]['next_batch'] = max(0, $next_scheduled_queue - time());
+								// Adjusted formula: (cronsneeded - 1) batches remaining AFTER next_batch + next_batch time
+								$this->data['sent'][$key]['remaining_time'] = max($queue_frequency, (($cronsneeded - 1) * $queue_frequency) + $this->data['sent'][$key]['next_batch']);
+							} else {
+								// Fallback if next_scheduled_queue is invalid: just use cronsneeded * frequency
+								$this->data['sent'][$key]['next_batch'] = $queue_frequency;
+								$this->data['sent'][$key]['remaining_time'] = $cronsneeded * $queue_frequency;
+							}
 						} else {
 							if ((in_array($this->data['sent'][$key]['status'], array(1, 3, 99))) && $this->data['sent'][$key]['type'] == 1)
 								$status_sent_complete[] = $key;

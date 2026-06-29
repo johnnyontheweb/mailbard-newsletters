@@ -129,17 +129,22 @@ class WYSIJA_control_front_subscribers extends WYSIJA_control_front{
             $widget_data['widget_id']='wysija-nl-iframe-'.$form_identifier;
         }
 
-
-        require_once(WYSIJA_WIDGETS.'wysija_nl.php');
-        $widget_NL=new WYSIJA_NL_Widget(true);
-        $widget_NL->iFrame=true;
-        $subscription_form = $widget_NL->widget($widget_data,$widget_data);
-        $subscription_form = str_replace("</head>", '<script type="text/javascript">
+        $widget_file = WYSIJA_WIDGETS.'wysija_nl.php';
+        if (!file_exists($widget_file)) {
+            $widget_file = dirname(dirname(dirname(__DIR__))).'/widgets/wysija_nl.php';
+        }
+        if (file_exists($widget_file)) {
+            require_once($widget_file);
+            $widget_NL=new WYSIJA_NL_Widget(true);
+            $widget_NL->iFrame=true;
+            $subscription_form = $widget_NL->widget($widget_data,$widget_data);
+            $subscription_form = str_replace("</head>", '<script type="text/javascript">
             /* <![CDATA[ */
             var wysijaAJAX = {"action":"wysija_ajax","controller":"subscribers","ajaxurl":"'.admin_url('admin-ajax.php','absolute').'","loadingTrans":"'.__('Loading...',WYSIJA).'"};
             /* ]]> */
             </script></head>', $subscription_form);
-        echo $subscription_form;
-        exit;
+            echo $subscription_form;
+            exit;
+        }
     }
 }

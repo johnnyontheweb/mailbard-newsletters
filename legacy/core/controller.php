@@ -14,6 +14,9 @@ class WYSIJA_control extends WYSIJA_object{
 	var $extension="legacy";
 	var $joins=array();
 	var $title="";
+	// PHP 8+ compatibility: declare dynamic properties
+	public $viewObj;
+	public $modelObj;
 
 	function __construct(){
 		//setup some required objects for the request
