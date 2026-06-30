@@ -247,8 +247,9 @@ class WYSIJA_help_mailer extends \PHPMailer\PHPMailer\PHPMailer {
 		}
 
 		if(function_exists('mb_convert_encoding') && !empty($this->sendHTML)){
-			// PHP 8+ compatible: use htmlentities instead of deprecated mb_convert_encoding with HTML-ENTITIES
-			$this->Body = htmlentities($this->Body, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			// Note: PHP 8.4 will generate a deprecation warning but this is needed for proper HTML email rendering
+			// The alternative htmlentities() would break HTML rendering by converting tags to entities
+			@$this->Body = mb_convert_encoding($this->Body,'HTML-ENTITIES','UTF-8');
 			$this->Body = str_replace('&amp;','&',$this->Body);
 		}
 
